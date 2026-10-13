@@ -19,29 +19,27 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20.11.1
-      # The old flat key. Leave unset and the deployment is open to anyone who
-      # knows the URL; set it here (Render keeps the value, not this file) and
-      # every call needs ?key=... or an x-api-key header.
-      - key: API_KEY
-        sync: false
-
-      # Signs the short-lived tokens this service hands out. Leave it UNSET for
-      # the first deploy: the API counts as open only while AUTH_SECRET, API_KEY
-      # and CLIENT_SECRET(S) are *all* empty (see `open:` in src/lib/auth.ts), so
-      # generating this one on its own locks every route — and the app cannot
-      # sign a request yet, so nothing could get back in. Turn it on together
-      # with CLIENT_SECRET, and only once the app ships the matching secret.
-      # To enable: set generateValue: true here, or paste a value in the dashboard.
-      - key: AUTH_SECRET
-        sync: false
-
-      # The app's shared secret — the one that signs a request to
-      # /api/auth/token. Render cannot invent this one: it has to match what is
-      # compiled into the app. Paste it here (or set CLIENT_SECRETS instead, as
-      # id:secret,id:secret, to keep an old and a new secret alive at once while
-      # the app is updated).
-      - key: CLIENT_SECRET
-        sync: false
+      # NOT declared here on purpose: AUTH_SECRET, API_KEY, CLIENT_SECRET.
+      #
+      # Render prompts for the value of every `sync: false` variable when the
+      # Blueprint is created, and there is no "optional" flag — so declaring
+      # these would ask for values that must stay *empty*. They must stay empty
+      # because the API counts as open only while all three are (see `open:` in
+      # src/lib/auth.ts), and the app cannot sign a request yet: filling any one
+      # of them locks every route with nothing able to get back in.
+      #
+      # Nothing is lost by leaving them out. An absent variable and an empty one
+      # are the same thing to this code — `trimmed()` in that same file turns
+      # both into ''.
+      #
+      # When the app ships the matching secret, add all of them here together:
+      #   - key: AUTH_SECRET
+      #     generateValue: true
+      #   - key: CLIENT_SECRET      # must equal the app's compiled secret
+      #     sync: false
+      #   - key: CLIENT_SECRETS     # optional: id:secret,id:secret to rotate
+      #     sync: false
+      #
       # Vedu (time:token) pairs from a current app build, comma separated. This
       # is required for Vedu playback: nothing is baked into the code any more,
       # because a captured pair is a credential. Vedu gates playback per build,

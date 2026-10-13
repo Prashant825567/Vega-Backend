@@ -39,16 +39,24 @@ se route hain.
    health check `/health`, region singapore).
    Manual bhi ho sakta hai: Web Service → build `npm ci && npm run build`, start
    `npm start`, health check `/health`.
-3. **Environment** me ye keys daalo:
-   - `AUTH_SECRET` — Render khud generate kar deta hai (`render.yaml` me
-     `generateValue`). Isse tokens sign hote hain. Iske bina token issue nahi hote.
-   - `CLIENT_SECRET` — app ka secret, jo `/api/auth/token` par request sign karta
-     hai. App me jo daaloge wahi yahan daalna hoga. Isse API public nahi rahti.
-   - `API_KEY` — purana flat key. Chahiye to rakho, warna khaali chhod do; auth ka
-     asli tareeka upar wala hai.
+3. **Environment** me abhi sirf **ek** key daalni hai:
    - `VEDU_AUTH_PAIRS` — **Vedu playback ke liye zaroori**, format
      `time:token,time:token`. Code me kuch baked nahi hai, isliye iske bina Vedu
-     routes error denge. Neeche Vedu wala note dekho.
+     routes error denge. Value local `.env` me hai; naya capture chahiye to
+     neeche Vedu wala note dekho.
+
+   Ye teen **jaan-boojh kar `render.yaml` me nahi hain**: `AUTH_SECRET`,
+   `API_KEY`, `CLIENT_SECRET`. Wajah: Render har `sync: false` variable ki value
+   Blueprint banate waqt maangta hai (aur koi "optional" flag nahi hota), jabki
+   inhe **khaali rehna hai** — API tab tak open hai jab tak teeno khaali hain, aur
+   app abhi koi request sign nahi karta, to ek bhi bharne se saare routes band ho
+   jaate hain aur andar aane ka koi raasta nahi bachta. Code me farak bhi nahi
+   padta: missing aur empty dono kuch nahi (`trimmed()` dono ko `''` banata hai,
+   `open:` wahi file me dekho).
+
+   Jab app me secret daalne ko tayyar ho jao, tab teeno ek saath add karo:
+   `AUTH_SECRET` (`generateValue: true`), `CLIENT_SECRET` (app ka compiled secret)
+   aur chaho to `CLIENT_SECRETS` (`id:secret,id:secret` — rotation ke liye).
 
 Free plan par instance so jaata hai, pehla request phir 30-50 second le sakta hai.
 Disk ephemeral hai, aur koi baat nahi: FilmTV apna account khud dobara bana leta
