@@ -25,10 +25,15 @@ services:
       - key: API_KEY
         sync: false
 
-      # Signs the short-lived tokens this service hands out. Render generates it
-      # once and keeps it; no need to invent or paste one.
+      # Signs the short-lived tokens this service hands out. Leave it UNSET for
+      # the first deploy: the API counts as open only while AUTH_SECRET, API_KEY
+      # and CLIENT_SECRET(S) are *all* empty (see `open:` in src/lib/auth.ts), so
+      # generating this one on its own locks every route — and the app cannot
+      # sign a request yet, so nothing could get back in. Turn it on together
+      # with CLIENT_SECRET, and only once the app ships the matching secret.
+      # To enable: set generateValue: true here, or paste a value in the dashboard.
       - key: AUTH_SECRET
-        generateValue: true
+        sync: false
 
       # The app's shared secret — the one that signs a request to
       # /api/auth/token. Render cannot invent this one: it has to match what is
